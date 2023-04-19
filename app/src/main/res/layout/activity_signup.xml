@@ -9,6 +9,7 @@
     android:padding="15dp"
     tools:context=".Login_activity">
     <TextView
+        android:id="@+id/check"
         android:text="Signup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
