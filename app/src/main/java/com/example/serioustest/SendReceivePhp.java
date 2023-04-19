@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class SendReceivePhp extends AppCompatActivity {
-    protected final String ADDRESS="http://192.168.1.34/";
+    protected final String ADDRESS="http://192.168.1.34/seriousTest/";
     protected String PAGE;
 
     protected void send( Map<String, String> params ) {

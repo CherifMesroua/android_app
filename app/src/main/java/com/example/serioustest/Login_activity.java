@@ -1,5 +1,7 @@
 package com.example.serioustest;
 
+import static android.os.SystemClock.sleep;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -28,7 +30,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Login_activity extends AppCompatActivity {
+public class Login_activity extends SendReceivePhp {
     Button login_btn;
     ProgressBar progressBar;
     TextView text;
@@ -43,6 +45,7 @@ public class Login_activity extends AppCompatActivity {
         login_btn=findViewById(R.id.login_btn);
         edit_email=findViewById(R.id.login_email);
         edit_password=findViewById(R.id.login_password);
+        PAGE="login.php";
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,71 +77,48 @@ public class Login_activity extends AppCompatActivity {
             }
         });
     }
-    protected void send(HashMap<String,String> hashMap){
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://192.168.1.36/seriousTest/login.php",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            String status = jsonObject.getString("status");
-                            if(status.equals("success")){
-                                JSONObject userinfo = jsonObject.getJSONObject("user_info");
-                                String username = userinfo.getString("username");
-                                String age = userinfo.getString("age");
-                                String address = userinfo.getString("address");
-                                String email = userinfo.getString("email");
-                                String info="username: "+username+"\nemail: "+""+email+"\nadress: "+address;
 
-                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                                SharedPreferences.Editor editor = preferences.edit();
-                                editor.putString("username", username);
-                                editor.putString("email", email);
-                                editor.putString("age", age);
-                                editor.putString("address", address);
-                                editor.apply();
+    @Override
+    protected void responseRecieved(String response, Map<String, String> params) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            String status = jsonObject.getString("status");
+            if(status.equals("success")){
+                JSONObject userinfo = jsonObject.getJSONObject("user_info");
+                String username = userinfo.getString("username");
+                String age = userinfo.getString("age");
+                String address = userinfo.getString("address");
+                String email = userinfo.getString("email");
+                //String info="username: "+username+"\nemail: "+""+email+"\nadress: "+address;
 
-                                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }else{
-                                String error = jsonObject.getString("message");
-                                Toast.makeText(getApplicationContext(), "1-Error in the json is : " + error, Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                                intent.putExtra("key", "1-Error in the json: " + error);
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-                        catch (JSONException e){
-                            Toast.makeText(getApplicationContext(), "2-Error in the json is : " + e.toString(), Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                            intent.putExtra("key", "2-Error in the json is : " + e.toString());
-                            startActivity(intent);
-                            finish();
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "3-volley Error: " + error.toString(), Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                        intent.putExtra("key", "3-volley Error: " + error.toString());
-                        startActivity(intent);
-                        finish();
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-
-                return hashMap;
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("username", username);
+                editor.putString("email", email);
+                editor.putString("age", age);
+                editor.putString("address", address);
+                editor.apply();
+                sleep(5);
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                startActivity(intent);
+                finish();
+            }else{
+                String error = jsonObject.getString("message");
+                Toast.makeText(getApplicationContext(), "1-Error in the json is : " + error, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                intent.putExtra("key", "1-Error in the json: " + error);
+                startActivity(intent);
+                finish();
             }
-        };
+        }
+        catch (JSONException e){
+            Toast.makeText(getApplicationContext(), "2-Error in the json is : " + e.toString(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            intent.putExtra("key", "2-Error in the json is : " + e.toString());
+            startActivity(intent);
+            finish();
+        }
 
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
     }
 
 }
